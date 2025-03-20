@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useEffect, useCallback, useState } from "react";
 import {
   ReactFlow,
   useNodesState,
@@ -10,6 +10,7 @@ import {
 
 import { InputNode } from "../components/node/InputNode";
 import { CircleNode } from "../components/node/Circle";
+import { ContextMenu } from "../components/ContextMenu.jsx";
 
 import dagreLayout from "../utils/dagreLayout.js";
 
@@ -21,17 +22,12 @@ export default function Canvas() {
   const treeData = [
     {
       id: "1",
-      data: { label: "根节点" },
       children: [
         {
           id: "2",
-          data: { label: "子节点 1" },
-          children: [
-            { id: "3", data: { label: "子节点 1.1" } },
-            { id: "4", data: { label: "子节点 1.2" } },
-          ],
+          children: [{ id: "4" }, { id: "5" }],
         },
-        { id: "5", data: { label: "子节点 2" } },
+        { id: "3" },
       ],
     },
   ];
@@ -43,12 +39,17 @@ export default function Canvas() {
 
     const traverse = (node, parentId = null) => {
       const nodeId = node.id || `${nodeIdCounter++}`;
-      nodes.push({ id: nodeId, data: node.data, position: { x: 0, y: 0 } });
+      nodes.push({
+        id: nodeId,
+        data: { label: nodeId },
+        position: { x: 0, y: 0 },
+      });
       if (parentId) {
         edges.push({
           id: `edge_${parentId}_${nodeId}`,
           target: nodeId,
           source: parentId,
+          animated: true,
         });
       }
       node.children?.forEach((e) => traverse(e, nodeId));
@@ -62,25 +63,49 @@ export default function Canvas() {
   const [nodes, setNodes, onNodesChange] = useNodesState(tree.nodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(tree.edges);
 
-  React.useEffect(() => {
-    const positionedNodes = dagreLayout([...nodes], edges);
-    console.log(positionedNodes);
+  const autoLayout = useCallback(() => {
+    const positionedNodes = dagreLayout(nodes, edges);
+    console.log(positionedNodes.nodes);
     setNodes([...positionedNodes.nodes]);
+  }, [nodes, edges]);
+
+  useEffect(() => {
+    autoLayout();
+  }, []);
+
+  const [menu, setMenu] = useState(null);
+  const onPaneContextMenu = useCallback((event) => {
+    event.preventDefault();
+    setMenu({
+      top: event.clientY,
+      left: event.clientX,
+    });
   }, []);
 
   return (
     <div style={{ width: "100vw", height: "100vh" }}>
       <ReactFlow
+        fitView
         nodeTypes={nodeTypes}
         nodes={nodes}
         edges={edges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
-        fitView
+        onPaneContextMenu={onPaneContextMenu}
       >
         <Controls />
         <MiniMap />
         <Background variant="dots" gap={12} size={1} />
+        {menu && (
+          <ContextMenu
+            {...menu}
+            setMenu={setMenu}
+            nodes={nodes}
+            setNodes={setNodes}
+            setEdges={setEdges}
+            autoLayout={autoLayout}
+          />
+        )}
       </ReactFlow>
     </div>
   );
