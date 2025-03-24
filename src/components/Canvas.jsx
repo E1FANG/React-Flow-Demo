@@ -1,12 +1,5 @@
-import React, { useMemo, useEffect, useCallback, useState } from "react";
-import {
-  ReactFlow,
-  useNodesState,
-  useEdgesState,
-  Controls,
-  MiniMap,
-  Background,
-} from "@xyflow/react";
+import React, { useMemo, useCallback, useState } from "react";
+import { ReactFlow, Controls, MiniMap, Background } from "@xyflow/react";
 
 import { InputNode } from "../components/node/InputNode";
 import { CircleNode } from "../components/node/Circle";
@@ -14,28 +7,23 @@ import { ContextMenu } from "../components/ContextMenu.jsx";
 
 import { useAvlTree } from "../hooks/useAvlTree.js";
 
-import dagreLayout from "../utils/dagreLayout.js";
-
 import "@xyflow/react/dist/style.css";
 
 export default function Canvas() {
   const nodeTypes = useMemo(() => ({ CircleNode, InputNode }), []);
 
-  const { tree, setTree, treeToFlow, avlTree } = useAvlTree();
-
-  const [nodes, setNodes, onNodesChange] = useNodesState(tree.nodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(tree.edges);
-
-  const autoLayout = useCallback(() => {
-    if (!tree.nodes?.length) return;
-    const positionedNodes = dagreLayout(tree.nodes,tree.edges);
-    setNodes([...positionedNodes.nodes]);
-    setEdges([...positionedNodes.edges]);
-  }, [nodes, edges,tree]);
-
-  useEffect(() => {
-    autoLayout();
-  }, [tree]);
+  const {
+    setTree,
+    treeToFlow,
+    avlTree,
+    nodes,
+    setNodes,
+    onNodesChange,
+    edges,
+    setEdges,
+    onEdgesChange,
+    autoLayout
+  } = useAvlTree();
 
   const [menu, setMenu] = useState(null);
   const onPaneContextMenu = useCallback((event) => {

@@ -1,5 +1,6 @@
-import { useState } from "react";
-import { Modal, Input } from "antd";
+import { useState, useRef } from "react";
+import { Modal, InputNumber,message } from "antd";
+import { TraverseTreeWithPreOrder } from "@/dataStructure/avlTree.js";
 
 export const ContextMenu = ({
   top,
@@ -49,18 +50,35 @@ export const ContextMenu = ({
     },
   ];
 
+  const inputRef = useRef(null);
   const [open, setOpen] = useState(false);
-  const [inputValue, setInputValue] = useState("");
+  const [inputValue, setInputValue] = useState();
+
+  const afterOpenChange = (isOpen) => {
+    isOpen && inputRef.current && inputRef.current.focus();
+  };
+
   const onCancel = () => {
     setOpen(false);
     setMenu(null);
   };
   const handleOk = () => {
-    avlTree.current.insert(Number(inputValue));
-    console.log(avlTree.current)
+    const treeFlatArray = TraverseTreeWithPreOrder(avlTree.current);
+    if (treeFlatArray.includes(inputValue)) {
+      message.warning("已有相等的节点");
+      return;
+    }
+    avlTree.current.insert(inputValue);
     setTree(treeToFlow());
-    setMenu(null)
+    setMenu(null);
   };
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleOk();
+    }
+  };
+
 
   return (
     <div style={menuStyle} className="absolute p-4 bg-cyan-800">
@@ -76,12 +94,21 @@ export const ContextMenu = ({
           {item.label}
         </div>
       ))}
-      <Modal title="添加节点" open={open} onOk={handleOk} onCancel={onCancel}>
-        <Input
+      <Modal
+        title="添加节点"
+        open={open}
+        onOk={handleOk}
+        onCancel={onCancel}
+        afterOpenChange={afterOpenChange}
+      >
+        <InputNumber
+          ref={inputRef}
+          className="w-full"
           placeholder="输入插入节点的值"
+          onKeyPress={handleKeyPress}
           value={inputValue}
           onChange={(e) => {
-            setInputValue(e.target.value);
+            setInputValue(e);
           }}
         />
       </Modal>

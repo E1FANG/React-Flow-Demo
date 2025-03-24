@@ -107,3 +107,17 @@ export class AVLTree {
     return child
   }
 }
+
+export const TraverseTreeWithPreOrder = (tree) => {
+  // 前序 根-左-右
+  const preRes = []
+  const preOrder = (root) => {
+    if (root === null) return
+    preRes.push(root.value)
+    preOrder(root.left)
+    preOrder(root.right)
+  }
+  preOrder(tree.root)
+  console.log('前序', preRes)
+  return preRes
+}
