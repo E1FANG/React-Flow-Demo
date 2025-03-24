@@ -1,15 +1,15 @@
-import { useReactFlow } from "@xyflow/react";
+import { useState } from "react";
+import { Modal, Input } from "antd";
 
 export const ContextMenu = ({
   top,
   left,
-  setNodes,
-  setEdges,
   setMenu,
   autoLayout,
+  setTree,
+  avlTree,
+  treeToFlow,
 }) => {
-  const { screenToFlowPosition } = useReactFlow();
-
   const menuStyle = {
     position: "fixed",
     left,
@@ -31,26 +31,7 @@ export const ContextMenu = ({
   };
 
   const addNode = () => {
-    const position = screenToFlowPosition({
-      x: left,
-      y: top,
-    });
-
-    const newNode = {
-      id: "6",
-      position,
-      data: { label: "6" },
-    };
-    setNodes((nds) => nds.concat(newNode));
-    setEdges((edges) =>
-      edges.concat({
-        id: `edge_${"1"}_${"6"}`,
-        target: "6",
-        source: "1",
-        animated: true,
-      })
-    );
-    setMenu(null);
+    setOpen(true);
   };
   const menuItems = [
     {
@@ -68,6 +49,19 @@ export const ContextMenu = ({
     },
   ];
 
+  const [open, setOpen] = useState(false);
+  const [inputValue, setInputValue] = useState("");
+  const onCancel = () => {
+    setOpen(false);
+    setMenu(null);
+  };
+  const handleOk = () => {
+    avlTree.current.insert(Number(inputValue));
+    console.log(avlTree.current)
+    setTree(treeToFlow());
+    setMenu(null)
+  };
+
   return (
     <div style={menuStyle} className="absolute p-4 bg-cyan-800">
       {menuItems.map((item) => (
@@ -82,6 +76,15 @@ export const ContextMenu = ({
           {item.label}
         </div>
       ))}
+      <Modal title="添加节点" open={open} onOk={handleOk} onCancel={onCancel}>
+        <Input
+          placeholder="输入插入节点的值"
+          value={inputValue}
+          onChange={(e) => {
+            setInputValue(e.target.value);
+          }}
+        />
+      </Modal>
     </div>
   );
 };

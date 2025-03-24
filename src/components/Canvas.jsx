@@ -12,6 +12,8 @@ import { InputNode } from "../components/node/InputNode";
 import { CircleNode } from "../components/node/Circle";
 import { ContextMenu } from "../components/ContextMenu.jsx";
 
+import { useAvlTree } from "../hooks/useAvlTree.js";
+
 import dagreLayout from "../utils/dagreLayout.js";
 
 import "@xyflow/react/dist/style.css";
@@ -19,59 +21,21 @@ import "@xyflow/react/dist/style.css";
 export default function Canvas() {
   const nodeTypes = useMemo(() => ({ CircleNode, InputNode }), []);
 
-  const treeData = [
-    {
-      id: "1",
-      children: [
-        {
-          id: "2",
-          children: [{ id: "4" }, { id: "5" }],
-        },
-        { id: "3" },
-      ],
-    },
-  ];
-
-  const treeToReactFlow = (treeData) => {
-    const nodes = [];
-    const edges = [];
-    let nodeIdCounter = 1;
-
-    const traverse = (node, parentId = null) => {
-      const nodeId = node.id || `${nodeIdCounter++}`;
-      nodes.push({
-        id: nodeId,
-        data: { label: nodeId },
-        position: { x: 0, y: 0 },
-      });
-      if (parentId) {
-        edges.push({
-          id: `edge_${parentId}_${nodeId}`,
-          target: nodeId,
-          source: parentId,
-          animated: true,
-        });
-      }
-      node.children?.forEach((e) => traverse(e, nodeId));
-    };
-    treeData.forEach((e) => traverse(e));
-    return { nodes, edges };
-  };
-
-  const tree = treeToReactFlow(treeData);
+  const { tree, setTree, treeToFlow, avlTree } = useAvlTree();
 
   const [nodes, setNodes, onNodesChange] = useNodesState(tree.nodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(tree.edges);
 
   const autoLayout = useCallback(() => {
-    const positionedNodes = dagreLayout(nodes, edges);
-    console.log(positionedNodes.nodes);
+    if (!tree.nodes?.length) return;
+    const positionedNodes = dagreLayout(tree.nodes,tree.edges);
     setNodes([...positionedNodes.nodes]);
-  }, [nodes, edges]);
+    setEdges([...positionedNodes.edges]);
+  }, [nodes, edges,tree]);
 
   useEffect(() => {
     autoLayout();
-  }, []);
+  }, [tree]);
 
   const [menu, setMenu] = useState(null);
   const onPaneContextMenu = useCallback((event) => {
@@ -92,6 +56,8 @@ export default function Canvas() {
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onPaneContextMenu={onPaneContextMenu}
+        onPaneClick={() => setMenu(null)}
+        onMove={() => setMenu(null)}
       >
         <Controls />
         <MiniMap />
@@ -104,6 +70,9 @@ export default function Canvas() {
             setNodes={setNodes}
             setEdges={setEdges}
             autoLayout={autoLayout}
+            treeToFlow={treeToFlow}
+            setTree={setTree}
+            avlTree={avlTree}
           />
         )}
       </ReactFlow>
