@@ -31,18 +31,17 @@ export const ContextMenu = ({
     transition: "background-color 0.2s",
   };
 
-  const addNode = () => {
-    setOpen(true);
-  };
   const menuItems = [
     {
       id: "1",
       label: "添加节点",
-      action: addNode,
+      action: () => {
+        setOpen(true);
+      },
     },
     {
       id: "2",
-      label: "自动布局",
+      label: "整理",
       action: () => {
         autoLayout();
         setMenu(null);
@@ -65,7 +64,7 @@ export const ContextMenu = ({
   const handleOk = () => {
     if (!inputValue && inputValue !== 0) {
       message.warning("请输入值");
-      return 
+      return;
     }
     const treeFlatArray = TraverseTreeWithPreOrder(avlTree.current);
     if (treeFlatArray.includes(inputValue)) {
