@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { Modal, InputNumber,message } from "antd";
+import { Modal, InputNumber, message } from "antd";
 import { TraverseTreeWithPreOrder } from "@/dataStructure/avlTree.js";
 
 export const ContextMenu = ({
@@ -63,6 +63,10 @@ export const ContextMenu = ({
     setMenu(null);
   };
   const handleOk = () => {
+    if (!inputValue && inputValue !== 0) {
+      message.warning("请输入值");
+      return 
+    }
     const treeFlatArray = TraverseTreeWithPreOrder(avlTree.current);
     if (treeFlatArray.includes(inputValue)) {
       message.warning("已有相等的节点");
@@ -74,11 +78,10 @@ export const ContextMenu = ({
   };
 
   const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       handleOk();
     }
   };
-
 
   return (
     <div style={menuStyle} className="absolute p-4 bg-cyan-800">
