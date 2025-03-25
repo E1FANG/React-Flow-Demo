@@ -8,10 +8,18 @@ class TreeNode {
     this.height = height || 0
   }
 }
+
+
 export class AVLTree {
   root = null
+  tasks = []
   constructor(value) {
     this.root = value ? new TreeNode(value) : null
+  }
+
+  #recordTask(operate, treeState) {
+    this.tasks.push({ operate, treeState, key: this.tasks.length })
+    console.log(this.tasks)
   }
 
   #updateHeight(node) {
@@ -34,9 +42,11 @@ export class AVLTree {
     }
     if (value < node.value) {
       node.left = this.#insert(node.left, value)
+      this.#recordTask('insertLeft', this)
     }
     if (value > node.value) {
       node.right = this.#insert(node.right, value)
+      this.#recordTask('insertRight', this)
     }
 
     this.#updateHeight(node)
@@ -57,9 +67,11 @@ export class AVLTree {
     // 左偏树
     if (balanceFactor > 1) {
       if (this.#getBalance(node.left) >= 0) {
+        this.#recordTask('左偏树右旋', this)
         return this.rightRotate(node)
       }// 子树偏右
       else {
+        this.#recordTask('左偏树子树偏右，先左旋再右旋', this)
         node.left = this.leftRotate(node.left)
         return this.rightRotate(node)
       }
@@ -67,9 +79,11 @@ export class AVLTree {
     // 右偏树
     if (balanceFactor < -1) {
       if (this.#getBalance(node.right) <= 0) {
+        this.#recordTask('右偏树左旋', this)
         return this.leftRotate(node)
       } else {
         //子树偏左
+        this.#recordTask('右偏树子树偏左，先右旋再左旋', this)
         node.right = this.rightRotate(node.right)
         return this.leftRotate(node)
       }

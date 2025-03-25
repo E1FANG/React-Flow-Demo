@@ -6,13 +6,13 @@ import {
   useEdgesState,
 } from "@xyflow/react";
 
-export const useAvlTree = () => {
-  const avlTree = useRef(new AVLTree(30))
+export const useAvlTree = (initialValue) => {
+  const avlTree = useRef(new AVLTree(initialValue))
 
-  avlTree.current.insert(20);
-  avlTree.current.insert(10); // 插入导致根节点失衡，触发右旋转
+  // avlTree.current.insert(20);
+  // avlTree.current.insert(10); // 插入导致根节点失衡，触发右旋转
 
-  const treeToFlow = () => {
+  const treeToFlow = useCallback(() => {
     const nodes = []
     const edges = []
 
@@ -38,11 +38,11 @@ export const useAvlTree = () => {
       nodes,
       edges
     }
-  }
-  const [tree, setTree] = useState(treeToFlow())
+  }, [])
+  const [tree, setTree] = useState({})
 
-  const [nodes, setNodes, onNodesChange] = useNodesState(tree.nodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(tree.edges);
+  const [nodes, setNodes, onNodesChange] = useNodesState([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const autoLayout = useCallback(() => {
     if (!tree.nodes?.length) return;
     const positionedNodes = dagreLayout(tree.nodes, tree.edges);

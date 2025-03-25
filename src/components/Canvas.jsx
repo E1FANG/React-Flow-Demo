@@ -4,6 +4,7 @@ import { ReactFlow, Controls, MiniMap, Background } from "@xyflow/react";
 import { InputNode } from "../components/node/InputNode";
 import { CircleNode } from "../components/node/Circle";
 import { ContextMenu } from "../components/ContextMenu.jsx";
+import { RecordsTable } from "@/components/RecordsTable";
 
 import { useAvlTree } from "../hooks/useAvlTree.js";
 
@@ -22,8 +23,8 @@ export default function Canvas() {
     edges,
     setEdges,
     onEdgesChange,
-    autoLayout
-  } = useAvlTree();
+    autoLayout,
+  } = useAvlTree(30);
 
   const [menu, setMenu] = useState(null);
   const onPaneContextMenu = useCallback((event) => {
@@ -34,8 +35,17 @@ export default function Canvas() {
     });
   }, []);
 
+  const onInit = () => {
+    console.log("init");
+
+    avlTree.current.insert(20);
+    // avlTree.current.insert(10); // 插入导致根节点失衡，触发右旋转
+    setTree(treeToFlow());
+  };
+
   return (
     <div style={{ width: "100vw", height: "100vh" }}>
+      <RecordsTable avlTree={avlTree} />
       <ReactFlow
         fitView
         nodeTypes={nodeTypes}
@@ -46,6 +56,7 @@ export default function Canvas() {
         onPaneContextMenu={onPaneContextMenu}
         onPaneClick={() => setMenu(null)}
         onMove={() => setMenu(null)}
+        onInit={onInit}
       >
         <Controls />
         <MiniMap />
