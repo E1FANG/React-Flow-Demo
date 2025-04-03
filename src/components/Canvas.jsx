@@ -3,6 +3,8 @@ import { ReactFlow, Controls, MiniMap, Background } from "@xyflow/react";
 
 import { InputNode } from "../components/node/InputNode";
 import { CircleNode } from "../components/node/Circle";
+import { AnimatedNode } from "./node/AnimatedNode.jsx";
+
 import { ContextMenu } from "../components/ContextMenu.jsx";
 import { RecordsTable } from "@/components/RecordsTable";
 
@@ -11,7 +13,10 @@ import { useAvlTree } from "../hooks/useAvlTree.js";
 import "@xyflow/react/dist/style.css";
 
 export default function Canvas() {
-  const nodeTypes = useMemo(() => ({ CircleNode, InputNode }), []);
+  const nodeTypes = useMemo(
+    () => ({ CircleNode, InputNode, default: AnimatedNode }),
+    []
+  );
 
   const {
     setTree,

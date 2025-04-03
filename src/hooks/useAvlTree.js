@@ -1,5 +1,5 @@
 import { AVLTree } from '@/dataStructure/avlTree'
-import { useRef, useState, useCallback, useEffect } from 'react';
+import { useRef, useState, useCallback, useEffect, useLayoutEffect } from 'react';
 import dagreLayout from "../utils/dagreLayout.js";
 import {
   useNodesState,

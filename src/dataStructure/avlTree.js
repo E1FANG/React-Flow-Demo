@@ -18,6 +18,7 @@ export class AVLTree {
   }
 
   #recordTask(operate, treeState) {
+    // 「插入节点 xxx，插入位置 xxx，具体行为：插入 左旋 右旋 」
     this.tasks.push({ operate, treeState, key: this.tasks.length })
     console.log(this.tasks)
   }

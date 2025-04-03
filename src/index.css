@@ -7,3 +7,13 @@
   padding: 0;
   margin: 0;
 } */
+
+.react-flow__node {
+  /* 如果使用 top/left 定位 */
+  transition: all 0.3s ease;
+}
+
+.react-flow__node.dragging {
+  /* 如果使用 top/left 定位 */
+  transition: none;
+}

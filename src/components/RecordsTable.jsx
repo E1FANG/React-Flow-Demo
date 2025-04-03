@@ -24,7 +24,7 @@ export const RecordsTable = ({ avlTree }) => {
   ];
   return (
     <div className="w-1/5 h-1/5 bg-conic-240 absolute top-0 right-0 z-10">
-      <Table columns={columns} dataSource={data} />
+      <Table columns={columns} dataSource={data} size="small"/>
     </div>
   );
 };
